@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}
+        <title>About | Michal Dacko Tutoring</title>
+{% endblock %}
+
+{% block about%}
+class="active"
+{% endblock %}
+
+{% block content %}
+    <div class="col-sm-12 col-md-9 panel">
+    {% for t in teachers %}
+        <div class="row">
+            <div class="col-sm-12 col-md-3">
+                <img class="img-fluid img-rounded" width="100%" height="auto" src="{{t.picturelink}}" style="margin-top: 15px;">
+            </div>
+            <div class="col-sm-12 col-md-9">
+                <h2 id="{{t.id}}">{{t}}</h2>
+                <p>{{t.about|linebreaks}}</p>
+                <p>{{t.qualifications|linebreaks}}</p>
+            </div>
+        </div>
+        <hr/>
+    {% endfor%}
+    </div>
+{% endblock %}

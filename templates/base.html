@@ -1,0 +1,107 @@
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="Description" content="High quality and affordable tutoring for Maths and Physics in Edinburgh"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="/static/css/app.css"/>
+        {% block title %}
+        {% endblock %}
+    </head>
+    <body class="container">
+            <div data-alert class="alert alert-danger centerIt" id="JavaScriptAlert">
+                It appears that you don't have JavaScript enabled. Please <a target="_blank" href="http://www.enable-javascript.com/">enable JavaScript</a> or some parts of this site will not function correctly.
+            </div>
+        <nav class="row">
+            <div class="col-sm-12 col-md-9">
+                <div class="row">
+                    <div class="col-sm-12 ">
+                        <h1>Michal Dacko Tutoring</h1>
+                    </div>
+                    <div class="col-sm-12 ">
+                        <h3>Tutoring for Maths and Physics in Edinburgh</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-3 centerIt">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p><h3>Contact Me</h3></p>
+                        <p><b>07547660040</b></p>
+                        <p><b><a href="mailto:dackomichal@gmail.com">dackomichal@gmail.com</a></b></p>
+                        <p><b><a href="http://www.linkedin.com/in/michal-dacko" target="_blank">Linked In</a></b></p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <hr/>
+        <div class="row">
+            <div class= "centerIt col-sm-12 col-md-3">
+                <nav class="row" >
+                    <div class="col-sm-12">
+                        <ul class="nav nav-pills nav-stacked">
+                            <li role="presentation" {% block home %}{% endblock%}><a href="/">Home</a></li>
+                            <li role="presentation" {% block about %}{% endblock%}><a href="/about">About</a></li>
+                            <li role="presentation" {% block pricing %}{% endblock%}><a href="/pricing">Pricing</a></li>
+                            <li role="presentation" {% block testimonials %}{% endblock%}><a href="/testimonials">Testimonials</a></li>
+                            <li role="presentation" {% block profile %}{% endblock%}><a href="/school">
+                                {% if user.is_authenticated %}
+                                Profile
+                                {%else%}
+                                Log In
+                                {%endif%}
+                            </a></li>
+                            {% if user.is_authenticated %}
+                                <li role="presentation"><a href="/school/logout">Log Out</a></li>
+                            {%endif%}
+                        </ul>
+                    </div>
+                </nav>
+                <div class="row">
+                    <div class="col-sm-12">
+                        {% if accepting %}
+                        <div data-alert class=" alert alert-success"><p><b>Contact Us!</b><br/> We're looking for students :D</p>
+                        </div>
+                        {% else %}
+                        <div data-alert class=" alert alert-danger"><p><b>Sorry.</b><br/> We're not looking for students at this time.</p>
+                        </div>
+                        {% endif%}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-9">
+                {%if messages%}
+                    {%for message in messages%}
+                    <div class="alert {{message.tags}}"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> {{message|linebreaks}}</div>
+                    {%endfor%}
+                {%endif%}
+                {%if notifications%}
+                    {%for n in notifications%}
+                    <div class="alert alert-{{n.css}}"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> {% if n.hasLink %}<a target="_blank" href="{{n.link}}"><i class="glyphicon glyphicon-new-window"></i></a>{%endif%} <b>{{n.title}}</b></br>{{n.text|linebreaks}}</div>
+                    {%endfor%}
+                {%endif%}
+            </div>
+            {% block content %}
+            {% endblock %}
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+        <script>
+            $(document).ready(function () {
+                $("#JavaScriptAlert").hide();
+                var heights = $(".thumbnail").map(function() {
+                    return $(this).height();
+                }).get(),
+
+                maxHeight = Math.max.apply(null, heights);
+
+                $(".thumbnail").height(maxHeight);
+            });
+        </script>
+        {% block includes %}
+        {% endblock %}
+    </body>
+</html>

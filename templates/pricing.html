@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load pounds %}
+
+{% block title %}
+        <title>Pricing | Michal Dacko Tutoring</title>
+{% endblock %}
+
+{% block pricing%}
+class="active"
+{% endblock %}
+
+{% block content %}
+    <div class="col-sm-12 col-md-9 panel">
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>How It Works</h2>
+                <p>Generally, I prefer to be paid per session either before or after it. This can be cash, cheque or a wire transfer. However, I am always willing to consider other methods and intervals of payment. The session fees are the only costs and include access the educational portal. The students are also able to contact me at any time with questions about their studies.
+                </p>
+            </div>
+            <div class="col-sm-12">
+                <div class="row centerIt">
+                  <h2>Pricing</h2>
+                  <div class="col-sm-12 col-md-6">
+                    <div class="thumbnail">
+                      <div class="caption">
+                        <h3>First Session</h3>
+                        <hr/>
+                        <h4>Free!</h4>
+                        <hr/>
+                        <p>The first session per client is free. You should use this to see if our style of teaching and approach is ideal for the pupil.</p>
+                        <hr/>
+                        <small><b>Free session may not be over 90 minutes long</b></small>
+                      </div>
+                    </div>
+                  </div>
+                  {% for level in levels%}
+                  <div class="col-sm-12 col-md-6">
+                    <div class="thumbnail">
+                      <div class="caption">
+                        <h3>{{level.name}}</h3>
+                        <hr/>
+                        <h4>&pound{{level.price | pound}}/hour</h4>
+                        <hr/>
+                        <p>{{level.note|linebreaks}}</p>
+                        <hr/>
+                        <small><b>{{level.recommended}}</b></small>
+                      </div>
+                    </div>
+                  </div>
+                  {%endfor%}
+                </div>
+            </div>
+            <div class="col-sm-12">
+                <h2>Canceling Sessions</h2>
+                <p>Generally, at the end of a session, I will attempt to plan the next one. The customer has no obligation to book another session. You can back out from my services whenever you want to, with no penalty or extra costs.</p>
+                <p>Additionally, if you book a session, but something comes up and the pupil is unable to attend, you can cancel the session by getting in touch. I ask only that you try and notify me at least 24 hours before the planned session.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

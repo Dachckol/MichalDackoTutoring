@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% load pounds %}
+
+{% block title %}
+        <title>View Session | Michal Dacko Tutoring</title>
+{% endblock %}
+
+{% block content %}
+    <div class="col-sm-12 col-md-9">
+        <div class="row">
+            <div class="col-sm-12 panel">
+                <h3>Session for <u>{{session.student.profile.getName}}</u>
+                on <u>{{session.date|date:'d/m/Y'}}</u> at <u>{{session.date|date:'H:i'}}</u>
+                </h3>
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <p><span class="label label-warning centerIt">{{session.teacher}}</span></p>
+                        <p>{%for sub in session.subjects.all%}<span class="label label-info centerIt">{{sub}} </span>{%endfor%}</p>
+                        <p>
+                        {%if session.report %}
+                        <span class="label label-success">Report</span>
+                        {%else%}
+                        <span class="label label-danger">No Report</span>
+                        {%endif%}
+                        {%if session.feedback %}
+                        <span class="label label-success">Feedback</span>
+                        {%else%}
+                        <span class="label label-danger">No Feedback</span>
+                        {%endif%}
+                        {%if session.paid%}
+                        <span class="label label-success">Paid</span>
+                        {%else%}
+                        <span class="label label-danger">Un-paid</span>
+                        {%endif%}
+                        </p>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <p><b>Duration: </b>{{session.duration}} minutes</p>
+                        <p><b>Cost: </b>{% if session.done %}{% if session.cost %}&pound{{session.cost|pound}}{% else %}&pound0.00{%endif%} {% if session.discount %}(&pound{{session.discount|pound}} discount applied){%endif%}{% else %}Pending{% endif %}</p>
+                        <p><b>Reference: </b>{{session.getReference}}</p>
+                    </div>
+                    <div class="col-sm-12">
+                        <hr/>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><b>Student: </b>
+                        {%if session.completedStudent %}
+                        <span class="label label-success">Completed</span>
+                        {%else%}
+                        <span class="label label-danger">Uncompleted</span>
+                        {%endif%}
+                        {%if not session.changedForStudent%}
+                        <span class="label label-success">Seen</span>
+                        {%else%}
+                        <span class="label label-danger">Pending Review</span>
+                        {%endif%}
+                        </p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p><b>Teacher: </b>
+                        {%if session.completedTeacher %}
+                        <span class="label label-success">Completed</span>
+                        {%else%}
+                        <span class="label label-danger">Uncompleted</span>
+                        {%endif%}
+                        {%if not session.changedForTeacher%}
+                        <span class="label label-success">Seen</span>
+                        {%else%}
+                        <span class="label label-danger">Pending Review</span>
+                        {%endif%}
+                        </p>
+                    </div>
+                    <div class="col-sm-12 centerIt">
+                        {% if session.completed %}
+                            {% for t in session.learnedTopics.all%}
+                            <a href="/school/topic/{{t.id}}" class="btn btn-xs btn-success">{{t.name}} {% if t.Resources.all|length%}<span class="badge">{{t.Resources.all|length}}</span>{%endif%}</a>
+                            {% endfor%}
+                            {% for t in session.unlearnedTopics.all%}
+                            <a href="/school/topic/{{t.id}}" class="btn btn-xs btn-danger">{{t.name}} {% if t.Resources.all|length%}<span class="badge">{{t.Resources.all|length}}</span>{%endif%}</a>
+                            {% endfor%}
+                        {% else%}
+                            {% for t in session.plannedTopics.all %}
+                            <a href="/school/topic/{{t.id}}" class="btn btn-xs btn-default">{{t.name}} {% if t.Resources.all|length%}<span class="badge">{{t.Resources.all|length}}</span>{%endif%}</a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row panel">
+            <div class="col-sm-9">
+                {% for error in sessionForm.non_field_errors%}
+                <div class="alert alert-dismissible alert-danger" role=alert>{{error}}</div>
+                {%endfor%}
+                <form action="/school/session/{{session.id}}/" method="post" class="form-horisontal">
+                    {% csrf_token %}
+                    <div class="form-group {%if sessionForm.notes.errors%}has-error{%endif%}">
+                        <label>Notes:</label>
+                        <textarea class="form-control" name="notes" id="notesInput" {%if not request.user.profile.isTeacher or session.done %}readonly{%endif%} placeholder="Notes for the student to read prior to the session. Aims, requirements, advice etc.">{{session.notes}}</textarea>
+                        <span class="help-block">{{sessionForm.notes.errors}}</span>
+                    </div>
+                    <div class="form-group {%if sessionForm.request.errors%}has-error{%endif%}">
+                        <label>Requests:</label>
+                        <textarea class="form-control" name="request" id="requestInput" {%if request.user.profile.isTeacher or session.done %}readonly{%endif%} placeholder="Requests for topics to be covered along with any other information for the teacher to see before the session. Parents/guardians can also make requests.">{{session.request}}</textarea>
+                        <span class="help-block">{{sessionForm.request.errors}}</span>
+                    </div>
+                    <div class="form-group {%if sessionForm.report.errors%}has-error{%endif%}">
+                        <label>Report:</label>
+                        <textarea class="form-control" name="report" id="requestInput" {%if not request.user.profile.isTeacher or not session.done or session.completed %}readonly{%endif%} placeholder="Teacher written report of the session. What was covered, how it went etc.">{{session.report}}</textarea>
+                        <span class="help-block">{{sessionForm.report.errors}}</span>
+                    </div>
+                    <div class="form-group {%if sessionForm.feedback.errors%}has-error{%endif%}">
+                        <label>Feedback:</label>
+                        <textarea class="form-control" name="feedback" id="requestInput" {%if request.user.profile.isTeacher or not session.done or session.completed%}readonly{%endif%} placeholder="These can be any final notes from the student regarding the session. What is still hard to understand, how could the session have went better? Parents/guardians can also leave feedback.">{{session.feedback}}</textarea>
+                        <span class="help-block">{{sessionForm.feedback.errors}}</span>
+                    </div>
+                    {% if not session.done %}
+                    {% if request.user.profile.isTeacher%}
+                    <div class="form-group {%if sessionForm.plannedTopics.errors%}has-error{%endif%}">
+                        <label for="subjectsSelect">Planned Topics:</label>
+                        <select multiple class="form-control" name="plannedTopics" id="topicsSelect">
+                            {% for choice in session.plannedTopics.all %}
+                                <option selected="true" value="{{choice.id}}">{{choice.name}}</option>
+                            {% endfor %}
+                            {%for choice in topics%}
+                                <option value="{{choice.id}}">{{choice.name}}</option>
+                            {%endfor%}
+                        </select>
+                        <span class="help-block">{{sessionForm.plannedTopics.errors}}</span>
+                        <span class="help-block"><button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#addtopic"><i class="glyphicon glyphicon-plus"></i> Create a new topic</button></span>
+                    </div>
+                    {%endif%}
+                    {% elif not session.completed and not request.user.profile.isParent%}
+                    <div class="form-group {%if sessionForm.learnedTopics.errors%}has-error{%endif%}">
+                        <label for="subjectsSelect">Learned Topics:</label>
+                        <select multiple class="form-control" name="learnedTopics" id="topicsSelect" >
+                            {% for choice in session.learnedTopics.all %}
+                                <option selected="true" value="{{choice.id}}">{{choice.name}}</option>
+                            {% endfor %}
+                            {%for choice in topics%}
+                                <option value="{{choice.id}}">{{choice.name}}</option>
+                            {%endfor%}
+                        </select>
+                        <span class="help-block">{{sessionForm.learnedTopics.errors}}</span>
+                    </div>
+                    {% endif %}
+                    {% if not session.completed%}
+                    <button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-pencil"></i> Update</button>
+                    {%endif%}
+                </form>
+            </div>
+            <div class="col-sm-3">
+                <div class="centerIt">
+                    {% if not session.completed %}
+                        <h4>Session Options</h4><hr/>
+                        {% if session.done%}
+                            {%if request.user.profile.isParent %}
+                                {% if session.paid %}
+                                    <p><a href="#" class="btn btn-xs btn-success" disabled><i class="glyphicon glyphicon-ok"></i> Paid</a></p>
+                                {% else %}
+                                   <p><button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#payinfo"><i class="glyphicon glyphicon-ok"></i> How To Pay</button></p>
+                                {% endif %}
+                            {% else %}
+                                {% if request.user.profile.isTeacher %}
+                                        {% if not session.paid %}
+                                            <p><a href="/school/markpaid/{{session.id}}" class="btn btn-xs btn-success"><i class="glyphicon glyphicon-ok"></i> Mark Paid</a></p>
+                                        {%else%}
+                                            {% if session.completedTeacher %}
+                                            <p><a href="#" class="btn btn-xs btn-success" disabled><i class="glyphicon glyphicon-ok"></i> Completed</a></p>
+                                            {% else %}
+                                            <p><a href="/school/complete/{{session.id}}" class="btn btn-xs btn-success"><i class="glyphicon glyphicon-ok"></i> Mark Complete</a></p>
+                                            {% endif %}
+                                        {%endif %}
+                                {% elif request.user.profile.isStudent %}
+                                    {% if session.completedStudent %}
+                                        <p><a href="#" class="btn btn-xs btn-success" disabled><i class="glyphicon glyphicon-ok"></i> Completed</a></p>
+                                    {% else %}
+                                        <p><a href="/school/complete/{{session.id}}" class="btn btn-xs btn-success"><i class="glyphicon glyphicon-ok"></i> Mark Complete</a></p>
+                                    {% endif %}
+                                {%endif%}
+                                <p><button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#upload"><i class="glyphicon glyphicon-upload"></i> Upload File</button></p>
+                            {%endif%}
+                        {% elif request.user.profile.isTeacher%}
+                            <p><a href="/school/done/{{session.id}}" class="btn btn-xs btn-success "><i class="glyphicon glyphicon-ok"></i> Mark Done</a></p>
+                        {% endif %}
+                    {%endif%}
+                    <hr/><h4>Session Files</h4>
+                    <div class="row">
+                        {% for u in session.uploads.all %}
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <p><a href="{{u.data.url}}"><i class="glyphicon glyphicon-download-alt"></i></a> {{u.name}}<br/><small>by {{u.author}}</small></p>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% if request.user.profile.isParent%}
+<div class="modal fade hide" id="payinfo" tabindex="-1" aria-labelledby="PayLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="PayLabel">Payment Information</h4>
+            </div>
+            <div class="modal-body">
+                <div data-alert class="alert alert-warning">
+                    <p><b>Warning:</b> If you have already paid for the session, please do not try doing so again. The session may not appear as "paid" as it is up to the teacher to mark it so. If you'd like the teacher to review this, please press the "Request Review" button.</p>
+                </div>
+                <p>There are many ways you can pay for the session. The following information clear up any issues:</p>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well">
+                            <h4>Payment In Cash</h4>
+                            <p>You can pay for the session in cash. If you haven't done this during the session, you can pay next time you see the teacher.</p>
+                            <p>If you have paid for the session in cash, but believe that the teacher has forgotten to mark it as paid, please press the "Request Review" button.</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="well">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-8">
+                                    <h4>Bank Transfer</h4>
+                                    <p>You can manually transfer the payment to the teacher. To do this, you will need the session refference. The refference for the session you are currently viewing is "{{session.getReference}}".</p>
+                                    <p>Please ensure that you are transfering to the bank account with the displayed details. After you have done so, please press the "Request Review" button to prompt the teacher to check their bank account.</p>
+                                </div>
+                                <div class="col-sm-12 col-md-4">
+                                    <p><b>Account Name:</b><br/>{{session.teacher.accountName}}</p>
+                                    <p><b>Sort Code:</b><br/>{{session.teacher.sortCode}}</p>
+                                    <p><b>Account Number:</b><br/>{{session.teacher.accountNumber}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <a href="/school/session/{{session.id}}/requestreview" class="btn btn-warning"><i class="glyphicon glyphicon-alert"></i> Request Review</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+    {% if request.user.profile.isTeacher %}
+    <div class="modal fade" id="addtopic" tabindex="-1" aria-labelledby="TopicLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="TopicLabel">Add Topic</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="/school/session/{{session.id}}/" method="post" class="form-horisontal">
+                        {% csrf_token %}
+                        <div class="form-group">
+                        {% for s in session.subjects.all %}
+                            <label class="radio-inline">
+                              <input type="radio" name="subject" value="{{s.id}}"><span class="label label-info">{{s}} </span>
+                            </label>
+                        {% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="name" placeholder="Topic Name" maxlength="100" required>
+                        </div>
+                        <button type="submit" class="btn btn-default">Add</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {%endif%}
+<div class="modal fade" id="upload" tabindex="-1" aria-labelledby="UploadFile">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="UploadFile">New Upload</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/school/session/{{session.id}}/" method="post" class="form-horisontal" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="author" value="{{request.user.profile.id}}">
+                    <div class="form-group {%if uploadForm.name.errors%}has-error{%endif%}">
+                        <label for="nameInput">Name*:</label>
+                        <input class="form-control" name="name" id="nameInput" type="text" placeholder="Name/Title" value="{%if uploadForm.name.value %}{{uploadForm.name.value}}{%else%}{%endif%}" required>
+                        <span class="help-block">{{uploadForm.name.errors}}</span>
+                    </div>
+                    <div class="form-group {%if uploadForm.data.errors%}has-error{%endif%}">
+                        <label for="dataInput">File*:</label>
+                        <input class="form-control" name="data" id="dataInput" type="file" required>
+                        <span class="help-block">{{uploadForm.data.errors}}</span>
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{%block includes%}
+<script type="text/javascript">
+$(document).ready(function () {
+    {%if uploadForm.errors%}
+        //$('#upload').modal('show');
+    {%endif%}
+});
+</script>
+{%endblock%}

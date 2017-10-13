@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+        <title>Log In | Michal Dacko Tutoring</title>
+{% endblock %}
+
+{% block profile%}
+class="active"
+{% endblock %}
+
+{% block content %}
+    <div class="col-sm-12 col-md-9 panel">
+        <div class="row">
+            <div class="col-sm-12 col-md-7">
+                <h2>Log In</h2>
+                <p>If you have forgotten your login details please contact me.</p>
+                {% for error in form.non_field_errors%}
+                <div class="alert alert-dismissible alert-danger" role=alert>{{error}}</div>
+                {%endfor%}
+                <form action="/school/login/" method="post" class="form-horizontal">
+                    {% csrf_token %}
+                    <div class="form-group {%if form.username.errors%}has-error{%endif%}">
+                        <label for="usernameInput" class="col-sm-3 control-label">Username :</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="username" id="usernameInput" placeholder="FirstNameSecondName eg: JohnSmith" maxlength="100" required>
+                        </div>
+                        <span class="help-block col-sm-offset-3">{{form.username.errors}}</span>
+                    </div>
+                    <div class="form-group {%if form.password.errors%}has-error{%endif%}">
+                        <label for="passwordInput" class="col-sm-3 control-label">Password :</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" name="password" id="passwordInput" placeholder="Password" maxlength="100" required>
+                        </div>
+                        <span class="help-block col-sm-offset-3">{{form.password.errors}}</span>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12 col-sm-offset-3">
+                            <button type="submit" class="btn btn-default">Log In</button>
+                        </div>
+                    </div
+                </form>
+            </div>
+            <div class="col-sm-12 col-md-5">
+                <h2>Accounts</h2>
+                <p>Pupils and their parents/guardians are given access to a learning portal where they can:
+                <ul>
+                    <li>Take part in planning future sessions</li>
+                    <li>Review the progress of previous sessions</li>
+                    <li>Leave feedback on the previous sessions</li>
+                    <li>Access and share useful educational resources</li>
+                    <li>and more!</li>
+                </ul>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load pounds %}
+
+{% block title %}
+        <title>Past Sessions | Michal Dacko Tutoring</title>
+{% endblock %}
+
+{% block content %}
+    <div class="col-sm-12 col-md-9">
+        <div class="row">
+            <div class="col-sm-12 panel">
+                <div class="centerIt"><h3>Past Sessions</h3></div>
+            </div>
+            <hr/>
+            <div class="col-sm-12">
+                {% if sessions %}
+                    {% for session in sessions %}
+                        <div class="row panel">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <h4>{{session.student.profile.getName}}</h4>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h5><b>Reference:</b> {{session.getReference}}</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-2">
+                                <p><span class="label label-warning centerIt">{{session.teacher}}</span></p>
+                                <p>{%for sub in session.subjects.all%}<span class="label label-info centerIt">{{sub}}</span> {%endfor%}</p>
+                                <a href="/school/session/{{session.id}}" class="btn btn-xs btn-default"><i class="glyphicon glyphicon-eye-open"></i> View</a>
+                            </div>
+                            <div class="col-sm-12 col-md-3">
+                                <p>
+                                    <b>Date: </b>{{session.date|date:'d/m/Y H:i'}}
+                                </p>
+                                <p>
+                                    <b>Duration: </b>{{session.duration}} minutes
+                                </p>
+                                <p>
+                                    <b>Cost: </b>&pound{{session.cost|pound}}
+                                </p>
+                                <p>
+                                    <b>Topics:</b> {{session.plannedTopics.all|length}} 
+                                </p>
+                            </div>
+                            <div class="col-sm-12 col-md-7">
+                                <p><b>Report: </b>
+                                    {{session.report|linebreaks}}
+                                </p>
+                                {% if session.feedback %}
+                                <p><b>Feedback: </b>
+                                    {{session.feedback|linebreaks}}
+                                </p>
+                                {%endif%}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                <p>There is nothing here.</p>
+                {%endif%}
+            </div>
+{% endblock %}

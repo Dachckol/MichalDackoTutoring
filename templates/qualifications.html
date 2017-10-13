@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}
+        <title>Qualifications | Michal Dacko Tutoring</title>
+{% endblock %}
+
+{% block qualifications%}
+class="active"
+{% endblock %}
+
+{% block content %}
+    <div class="col-sm-12 col-md-9">
+        <div class="row">
+            <div class="col-sm-12 panel">
+                <div class="row">
+                    <div class="col-sm-12 centerIt">
+                        <h2>Relevant Qualifications</h2>
+                        <p>Below are the qualifications that make me a competent tutor. If you would like to see the certificates of these, please get in touch and I can provide pictures/photocopies.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% for q in qualifications %}
+            <div class="col-sm-12 panel">
+                <div class="row centerIt">
+                    <div class="col-sm-12 col-md-6">
+                        <h2>{{q.name}}</h2>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <h3>{{q.value}}</h3>
+                    </div>
+                    {% if q.details %}
+                    <div class="col-sm-12">
+                    <hr/>
+                        <p>{{q.details}}</p>
+                    </div>
+                    {% endif %}
+                    <div class="col-sm-12">
+                        <small>Received on {{q.date}}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor%}
+        </div>
+    </div>
+{% endblock %}

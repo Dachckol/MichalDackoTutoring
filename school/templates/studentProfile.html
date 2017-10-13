@@ -1,0 +1,105 @@
+{% extends "profileBase.html" %}
+{% load pounds %}
+
+{% block title %}
+        <title>Profile | Michal Dacko Tutoring</title>
+{% endblock %}
+
+{% block stuff %}
+        <div class="row">
+            <div class="col-sm-12 col-md-6">
+                <div class="row">
+                    <div class="col-sm-12 panel">
+                        <div class="centerIt"><h3>Pending Sessions</h3></div>
+                    </div>
+                    <hr/>
+                    <div class="col-sm-12">
+                        {% if unDoneSessions %}
+                            {% for session in unDoneSessions %}
+                                <div class="row panel">
+                                    <div class="col-sm-12">
+                                        <h4>{{session.student.profile.getName}}</h4>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <p><span class="label label-warning centerIt">{{session.teacher}}</span></p>
+                                        <p>{%for sub in session.subjects.all%}<span class="label label-info centerIt">{{sub}}</span> {%endfor%}</p>
+                                        <a href="/school/session/{{session.id}}" class="btn btn-xs {% if session.changedForStudent and profile.isStudent%}btn-danger{%else%}btn-default{%endif%} "><i class="glyphicon glyphicon-eye-open"></i> View</a>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <p>{{session.date|date:'d/m/Y H:i'}}</p>
+                                        <p>{{session.duration}} minutes</p>
+                                        <p>{{session.plannedTopics.all|length}} topics</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                        <p>There is nothing here.</p>
+                        {%endif%}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <div class="row">
+                    <div class="col-sm-12 panel">
+                        <div class="centerIt"><h3>Recent Sessions</h3></div>
+                    </div>
+                    <hr/>
+                    <div class="col-sm-12">
+                        {% if DoneSessions %}
+                            {% for session in DoneSessions %}
+                                <div class="row panel">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <h4>{{session.student.profile.getName}}</h4>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <h5><b>Reference:</b> {{session.getReference}}</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <p><span class="label label-warning centerIt">{{session.teacher}}</span></p>
+                                        <p>{{session.date|date:'d/m/Y H:i'}} ({{session.duration}})</p>
+                                        <a href="/school/session/{{session.id}}" class="btn btn-xs {% if session.changedForStudent and profile.isStudent%}btn-danger{%else%}btn-default{%endif%}"><i class="glyphicon glyphicon-eye-open"></i> View</a>
+                                        {% if profile.isStudent %}
+                                        {% if session.completedStudent %}
+                                        <a href="#" class="btn btn-xs btn-success" disabled><i class="glyphicon glyphicon-ok"></i> Completed</a>
+                                        {% else %}
+                                        <a href="/school/complete/{{session.id}}" class="btn btn-xs btn-success"><i class="glyphicon glyphicon-ok"></i> Complete</a>
+                                        {% endif %}
+                                        {% endif%}
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        {%if session.report %}
+                                        <span class="label label-success">Report</span>
+                                        {%else%}
+                                        <span class="label label-danger">No Report</span>
+                                        {%endif%}
+                                        {%if session.feedback %}
+                                        <span class="label label-success">Feedback</span>
+                                        {%else%}
+                                        <span class="label label-danger">No Feedback</span>
+                                        {%endif%}
+                                        {%if session.paid%}
+                                        <span class="label label-success">Paid</span>
+                                        {%else%}
+                                        <span class="label label-danger">Un-paid</span>
+                                        {%endif%}
+                                        <h4>&pound{{session.cost|pound}}</h4>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                        <p>There is nothing here.</p>
+                        {%endif%}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 well">
+            <p><b>Pending Sessions: </b>These are future sessions. The student and teacher can plan the session together. After the session is complete the teacher will mark it so. It will then appear under "Recent Sessions" where the student can provide feedback, and teacher can write a report about the session. If a session contains changes not yet seen by the user, the "View" button will be red.</p>
+            <p><b>Recent Sessions: </b>The session will remain here until it is paid for and marked as "complete" by both the student and teacher. A session cannot be marked complete if it contains changes not yet seen by the user (red "View" button). After a session is complete it can still be reviewed by clicking the "View Past Sessions" button.</p>
+        </div>
+    </div>
+{% endblock %}
